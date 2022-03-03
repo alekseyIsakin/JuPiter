@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import numpy as np
 import cv2
 
@@ -48,6 +49,13 @@ class Island():
   def __len__(self) -> int:
     return len(self.lines)
   
+  def get_lines_at_index(self, index:int) -> list[Line]:
+    if (index > self.maxH or index < self.minH):
+      return []
+    return [l for l in self.lines if l.index == index]
+    
+    
+
   def append_one_line(self, l:Line) -> None:
     if len(self.lines) == 0:
       # self.lines.append = [l]

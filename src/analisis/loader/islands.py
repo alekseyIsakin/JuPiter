@@ -35,42 +35,40 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
   return raw_islands
 
 
-def _second_graph_config(ecg:list[Island]) -> list[Island]:
+def _second_graph_config(islands:list[Island]) -> list[Island]:
   isl_rest = 0
   complete:list[Island] = []
-  while len(ecg) > 0:
-    start_check_island = ecg[-1][0]
-
+  while len(islands) > 0:
     isl_rest = 0
     
-    while isl_rest < len(ecg)-1:
+    while isl_rest < len(islands)-1:
       found = False
-      islands = ecg[isl_rest]
+      _islands = islands[isl_rest]
       
-      if (ecg[-1].minW > islands.maxW or
-          ecg[-1].maxW < islands.minW or
-          ecg[-1].minH > islands.maxH or
-          ecg[-1].maxH < islands.minH):
-          # slow_draw_islands([ecg[-1], islands], mask_inv, sleeptime=3)
+      if (islands[-1].minW > _islands.maxW or
+          islands[-1].maxW < _islands.minW or
+          islands[-1].minH > _islands.maxH or
+          islands[-1].maxH < _islands.minH):
           isl_rest += 1
           continue
 
-      for line in islands:
-        for line2 in ecg[-1]:
+      for line in _islands:
+        arr_lines2:list[Line] = []
+        
+        for line2_offset in (-1,1):
+          arr_lines2 = islands[-1].get_lines_at_index(line.index + line2_offset)
+        
+        for line2 in arr_lines2:
           if not is_neighbours(line, line2):
-              ecg[-1] = ecg[-1] + islands
-              tmp = ecg[-1]
-              # slow_draw_island(ecg[-1], mask_inv)
-              ecg.remove(islands)
+              islands[-1] = islands[-1] + _islands
+
+              islands.remove(_islands)
               isl_rest = 0
               found = True
               break
-        if found: 
-            break
         
       if not found: 
         isl_rest += 1
 
-    complete.append(ecg.pop())
+    complete.append(islands.pop())
   return complete
-    # draw_islands(complete, mask_inv, clr=(255,0,0))
