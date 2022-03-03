@@ -35,6 +35,24 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
 def _second_graph_config(islands:list[Island]) -> list[Island]:
   isl_rest = 0
   complete:list[Island] = []
+  
+  # while isl_rest < len(islands)-1:
+  #   small_isl = islands[isl_rest]
+  #   in_bound = False
+  #   for cur_isl in islands:
+  #     if not (cur_isl.minW > small_isl.maxW  or
+  #             cur_isl.maxW < small_isl.minW  or
+  #             cur_isl.minH > small_isl.maxH  or
+  #             cur_isl.maxH < small_isl.minH ): 
+  #         isl_rest += 1
+  #         in_bound = True
+  #         break
+    
+  #   if not in_bound:
+  #     complete.append(islands.pop(isl_rest))
+          
+  print(f"{len(complete)}")
+  isl_rest = 0
   while len(islands) > 0:
     isl_rest = 0
     
@@ -53,7 +71,7 @@ def _second_graph_config(islands:list[Island]) -> list[Island]:
       for line in cur_island:
         arr_lines2:list[Line] = []
         
-        for line2_offset in (-1,0,1):
+        for line2_offset in (-1,1):
           arr_lines2.extend(last_island.get_lines_at_index(line.index + line2_offset))
         if len(arr_lines2) == 0: continue
 

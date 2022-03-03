@@ -44,7 +44,7 @@ mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR)
 
 mask_array:list[np.ndarray] = []
 
-for up_value in range(80,120,10):
+for up_value in range(80,130,10):
   mask_array.append(get_mask_from_gray(img, upper_val=up_value).copy())
 
 for i, mask in enumerate(mask_array):

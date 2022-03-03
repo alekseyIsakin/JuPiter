@@ -7,3 +7,5 @@ call "%cd%\env\Scripts\activate.bat"
 cd "project"
 
 py "%~dp0src/main.py"
+
+pause
