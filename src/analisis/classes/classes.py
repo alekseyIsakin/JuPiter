@@ -33,6 +33,13 @@ class Line():
             self.top == other.top and
             self.down == other.down)      
 
+  def is_neighbour(self, other)->bool:
+    if (abs(self.index - other.index) > 1): return False
+    if ((self.top <= (other.top+1) and self.top >= (other.down-1)) or
+          (self.down <= (other.top+1) and self.down >= (other.down-1)) or
+          (other.top <= (self.top+1) and other.top >= (self.down-1))  or
+          (other.down <= (self.top+1) and other.down >= (self.down-1))): return True
+    return False
 
 class Island():
   def __init__(self):
@@ -50,7 +57,8 @@ class Island():
     return len(self.lines)
   
   def get_lines_at_index(self, index:int) -> list[Line]:
-    if (index > self.maxH or index < self.minH):
+
+    if (index > self.maxW or index < self.minW):
       return []
     return [l for l in self.lines if l.index == index]
     

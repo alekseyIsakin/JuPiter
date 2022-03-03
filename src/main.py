@@ -47,11 +47,11 @@ mask_array:list[np.ndarray] = []
 for up_value in range(80,120,10):
   mask_array.append(get_mask_from_gray(img, upper_val=up_value).copy())
 
-for mask in mask_array:
+for i, mask in enumerate(mask_array):
   isl = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
   for x in range(img.shape[1] // step_x):
     for y in range(img.shape[0] // step_y):
-      lg.debug(f">> step [{x}|{y}][{x*step_x}, {y*step_y}]")
+      lg.debug(f">> step {i} [{x}|{y}][{x*step_x}, {y*step_y}]")
 
       # lines_arr = get_lines(mask_inv)
       # complete = islands_from_lines(lines_arr)
@@ -60,7 +60,10 @@ for mask in mask_array:
       isl[y*step_y:(y+1)*step_y, x*step_x:(x+1)*step_x] = 255
       isl = draw_islands(complete, isl)
       isl = cv2.rectangle(isl, (x*step_x, y*step_y),((x+1)*step_x,(y+1)*step_y,), color=(0,0,255))
-      completeFull.append(complete.copy())
+      lg.debug(f">> found [{len(complete)}]")
+
+      # completeFull.append(complete.copy())
+
       cv2.imshow('w', isl)
       cv2.putText(isl, "asd", (0,0),1,cv2.FONT_HERSHEY_COMPLEX,(0,0,255))
       cv2.waitKey(200)

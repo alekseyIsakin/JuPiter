@@ -150,7 +150,7 @@ def get_low_up(graph:list[Island], img=np.zeros(0)) -> list[int]:
 
     return mainPoints
   
-def is_neighbours(l=Line(0,0,0), r=Line(0,0,0)):
+def is_not_neighbours(l=Line(0,0,0), r=Line(0,0,0)):
   return not (not abs(l.index - r.index) > 1 and 
          ((l.top <= (r.top+1) and l.top >= (r.down-1)) or
           (l.down <= (r.top+1) and l.down >= (r.down-1)) or
