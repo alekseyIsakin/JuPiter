@@ -1,6 +1,2 @@
-src/__pycache__/classes.cpython-39.pyc
-src/__pycache__/funcs.cpython-39.pyc
-src/__pycache__/paths.cpython-39.pyc
-
 images/output/*
-*.pic
+*.pyc

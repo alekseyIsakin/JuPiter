@@ -86,7 +86,6 @@ def _second_graph_config(islands:list[Island]) -> list[Island]:
           break
         if found: break
         
-      lg.info(f'{isl_rest}')
       if not found: 
         isl_rest += 1
 
