@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from cmath import inf, nan
 import numpy as np
 import cv2
 
@@ -56,11 +57,11 @@ class Island():
   def __len__(self) -> int:
     return len(self.lines)
   
-  def get_lines_at_index(self, index:int) -> list[Line]:
+  def get_lines_at_index(self, index:int, top:int=nan, down:int=inf) -> list[Line]:
 
     if (index > self.maxW or index < self.minW):
       return []
-    return [l for l in self.lines if l.index == index]
+    return [l for l in self.lines if (l.index == index)]
     
     
 
