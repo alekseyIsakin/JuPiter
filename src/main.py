@@ -28,8 +28,8 @@ lg.info(f"load image '{file}'")
 lg.debug(f"resolution '{file}' is {img.shape}")
 completeFull:list[list[list[Island]]] = []
 
-step_x = img.shape[1] // 4
-step_y = img.shape[0] // 4
+step_x = img.shape[1] // 5
+step_y = img.shape[0] // 40
 
 def fragment_calculate(coord_x:int, coord_y:int,
   step_x:int, step_y:int, mask_inv:np.ndarray) -> list[Island]:
@@ -44,8 +44,8 @@ mask_inv = get_mask_from_gray(img, upper_val=100)
 mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR) 
 
 mask_array:list[np.ndarray] = []
-up_value_from = 90
-up_value_to = 100
+up_value_from = 100
+up_value_to = 110
 up_value_step = 10
 
 for up_value in range(up_value_from, up_value_to, up_value_step):
@@ -76,7 +76,8 @@ for i, mask in enumerate(mask_array):
       cv2.waitKey(10)
   
 cv2.imwrite(PATH_TO_MASK_ + "_test.png", isl)
-  
+
+del isl
 isl:np.ndarray = img_clr.copy()
 islands:list[Island] = []
 
@@ -89,18 +90,19 @@ for col in completeFull:
 
   isl = draw_islands(cur_row, isl)
   cv2.imshow('w', isl)
-  cv2.waitKey(200)
+  cv2.waitKey(10)
 
-# del completeFull
+del completeFull
 
+del isl
 isl:np.ndarray = img_clr.copy()
 complete_isl:list[Island] = []
 for i, row in enumerate(islands):
   complete_isl.extend(row)
-  complete_isl = _second_graph_config(complete_isl, check_bounds_top=i*step_y)
+  complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=(i-1)*step_y)
   isl = draw_islands(complete_isl, isl)
   cv2.imshow('w', isl)
-  cv2.waitKey(200)
+  cv2.waitKey(10)
 cv2.waitKey(0)
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 

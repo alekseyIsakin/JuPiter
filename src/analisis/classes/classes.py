@@ -57,11 +57,12 @@ class Island():
   def __len__(self) -> int:
     return len(self.lines)
   
-  def get_lines_at_index(self, index:int, top:int=nan, down:int=inf) -> list[Line]:
-
+  def get_lines_at_index(self, index:int, top:int=-inf, down:int=inf) -> list[Line]:
     if (index > self.maxW or index < self.minW):
       return []
-    return [l for l in self.lines if (l.index == index)]
+    # if (top > self.minH +1 and down < self.maxH -1):
+    #   return []
+    return [l for l in self.lines if (l.index == index) and (l.down > top-1)]
     
     
 

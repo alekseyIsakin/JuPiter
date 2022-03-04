@@ -33,7 +33,7 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
   return raw_islands
 
 
-def _second_graph_config(islands:list[Island], check_bounds_top=nan, check_bounds_down=inf) -> list[Island]:
+def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_bounds_down=inf) -> list[Island]:
   isl_rest = 0
   complete:list[Island] = []
           
@@ -63,9 +63,9 @@ def _second_graph_config(islands:list[Island], check_bounds_top=nan, check_bound
       
       for line in cur_island:
         arr_lines2:list[Line] = []
-        
+
         for line2_offset in (-1,0,1):
-          arr_lines2.extend(last_island.get_lines_at_index(line.index + line2_offset, line.top, line.down))
+          arr_lines2.extend(last_island.get_lines_at_index(line.index + line2_offset, check_bounds_top, line.down))
         if len(arr_lines2) == 0: continue
 
         for line2 in arr_lines2:
