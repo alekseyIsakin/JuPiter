@@ -103,9 +103,18 @@ class Island():
     self.lines = newlines
 
   def __add__(self, other):
-    for i in other:
-      self.append_one_line(i)
-      
+    tmp = np.empty(len(self.lines) + len(other), dtype=line_np_type)
+    ind = 0
+    for i, v in enumerate(self.lines):
+      tmp['index'][i] = v.index
+      tmp['top'][i] = v.top
+      tmp['down'][i] = v.down
+      ind = i
+    for i, v in enumerate(other):
+      tmp['index'][ind + i] = v.index
+      tmp['top'][ind + i] = v.top
+      tmp['down'][ind + i] = v.down
+    self.lines = tmp
     self.lines = np.sort(self.lines)
     return self
 
