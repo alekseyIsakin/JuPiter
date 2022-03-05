@@ -19,8 +19,8 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_OUTPUT_JPG
 lg.info("Start")
 
-# file = "test6.png"
-file = "input.jpg"
+file = "test5.png"
+# file = "input.jpg"
 img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_GRAYSCALE)
 img_clr:ndarray = cv2.imread(PATH_TO_INPUT_ + file)
 
@@ -28,8 +28,8 @@ lg.info(f"load image '{file}'")
 lg.debug(f"resolution '{file}' is {img.shape}")
 completeFull:list[list[list[Island]]] = []
 
-step_x = img.shape[1] // 5
-step_y = img.shape[0] // 40
+step_x = img.shape[1] // 2
+step_y = img.shape[0] // 2
 
 def fragment_calculate(coord_x:int, coord_y:int,
   step_x:int, step_y:int, mask_inv:np.ndarray) -> list[Island]:
@@ -103,7 +103,7 @@ for i, row in enumerate(islands):
   isl = draw_islands(complete_isl, isl)
   cv2.imshow('w', isl)
   cv2.waitKey(10)
-cv2.waitKey(0)
+# cv2.waitKey(0)
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 
 exit()
