@@ -62,7 +62,7 @@ class Island():
       return []
     # if (top > self.minH +1 and down < self.maxH -1):
     #   return []
-    return [l for l in self.lines if (l.index == index) and (l.down > top-1)]
+    return [l for l in self.lines if (l.index == index) and (l.down >= top)]
     
     
 

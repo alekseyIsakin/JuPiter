@@ -1,6 +1,10 @@
 from cmath import inf, nan
+import cv2
+
+import numpy as np
 from analisis.classes.classes import Line, Island
 from analisis.loader.img_analizer import is_not_neighbours
+from drawing.draw import draw_islands
 from logger import lg
 
 def islands_from_lines(graph:list[Line]) -> list[Island]:
@@ -38,13 +42,18 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
   complete:list[Island] = []
           
   isl_rest = 0
-
   if (check_bounds_top != nan):
     while isl_rest < len(islands):
       if islands[isl_rest].maxH < check_bounds_top:
         complete.append(islands.pop(isl_rest))
       else:
         isl_rest += 1
+  if check_bounds_top != -inf:
+    isl1 = draw_islands(complete, np.ones((670, 1280))*0)
+    isl2 = draw_islands(islands, np.ones((670, 1280))*0)
+    cv2.imshow('q', isl1)
+    cv2.imshow('z', isl2)
+    cv2.waitKey(200)
 
   while len(islands) > 0:
     isl_rest = 0
@@ -60,7 +69,7 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
           last_island.maxH +1 < cur_island.minH):
           isl_rest += 1
           continue
-      
+
       for line in cur_island:
         arr_lines2:list[Line] = []
 
