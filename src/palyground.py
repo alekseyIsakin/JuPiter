@@ -20,6 +20,7 @@ from constant.paths import PATH_TO_IMAGES, PATH_TO_INPUT_JPG, \
                   PATH_TO_OUTPUT_
 
 import pickle
+import timeit
 
 # lg.info("palyground start")
 # file = "input.jpg"
@@ -47,22 +48,22 @@ img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_COLOR)
 # with open("test2.bin", mode="wb") as f:
 #     pickle.dump({}, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-dt1:dict
-dt2:dict
-with open('test1.bin', 'rb') as f: dt1 = pickle.load(f)
-with open('test2.bin', 'rb') as f: dt2 = pickle.load(f)
+def test(isl:Island, isl2:Island):
+  isl = isl + isl2
 
-print(dt1)
-print(dt2)
+isl = Island()
+isl2 = Island()
+for i in range(10):
+  l = Line(rnd.randint(0,10),rnd.randint(0,255),rnd.randint(0,75))
+  isl.append_one_line(l)
+for i in range(5):
+  isl2.append_one_line(Line(rnd.randint(0,45),rnd.randint(0,255),rnd.randint(0,78)))
 
-for k in dt1:
-  canvas = img.copy()
-  cv2.line(canvas, (dt1[k][0], dt1[k][1]),(dt1[k][0], dt1[k][2]), (0,0,255))
-  for i in dt2[k]:
-    cv2.line(canvas, (i[0], i[1]),(i[0], i[2]), (0,255,0))
-  cv2.imshow('w', canvas)
-  cv2.imwrite(PATH_TO_OUTPUT_ + 'out.png', canvas)
-  cv2.waitKey(0)
-  pass
+setup="""
+from __main__ import test, isl, isl2
+"""
+
+tm = timeit.timeit('test(isl, isl2)', setup=setup, number=500)
+print(tm)
 # imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 # lg.info(f"fin")

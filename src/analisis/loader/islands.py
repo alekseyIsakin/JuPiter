@@ -74,26 +74,8 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
 
         neighbours_arr = map(lambda l: not is_not_neighbours(line, l), arr_lines2)
         condition = any([i for i in neighbours_arr])
-        ll2 = [not is_not_neighbours(l, line) for l in arr_lines2]
-        if condition:
-          dt1 = {}
-          dt2 = {}
-          # with open('test1.bin', 'rb') as f: 
-          #   dt1 = pickle.load(f)
-          # with open('test2.bin', 'rb') as f: 
-          #   dt2 = pickle.load(f)
-          
-          # if (write_counter == 0 and len(dt1.keys()) != 0): 
-          #   write_counter = max(dt1.keys())
 
-          # dt1[write_counter] = line
-          # dt2[write_counter] = arr_lines2
-          
-          # with open("test1.bin", mode="wb") as f: 
-          #   pickle.dump(dt1, f, protocol=pickle.HIGHEST_PROTOCOL)
-          # with open("test2.bin", mode="wb") as f: 
-          #   pickle.dump(dt2, f, protocol=pickle.HIGHEST_PROTOCOL)
-          # write_counter += 1
+        if not condition:
           continue
 
         last_island = last_island + cur_island
