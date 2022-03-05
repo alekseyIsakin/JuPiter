@@ -3,7 +3,7 @@ from cmath import inf, nan
 import numpy as np
 import cv2
 
-line_np_type = np.dtype([('index', np.int32),('down', np.int32),('top', np.int32)])
+line_np_type = np.dtype([('index', np.int32),('top', np.int32),('down', np.int32)])
 
 class Line():
   def __init__(self, index, top, down) -> None:
@@ -12,9 +12,9 @@ class Line():
     self.top = top
 
   def __getitem__(self, key):
-    if key == 0: return self.index
-    if key == 1: return self.top
-    if key == 2: return self.down
+    if key == 0 or ['index']: return self.index
+    if key == 1 or ['top']:   return self.top
+    if key == 2 or ['down']:  return self.down
     
   def __repr__(self):
     return ("{ index: " + str(self.index) + ", " +\
@@ -62,7 +62,7 @@ class Island():
       return []
     # if (top > self.minH +1 and down < self.maxH -1):
     #   return []
-    return [l for l in self.lines if (l.index == index) and (l.down > top-1)]
+    return [l for l in self.lines if (l['index'] == index) and (l['down'] > top-1)]
     
     
 
@@ -104,18 +104,15 @@ class Island():
 
   def __add__(self, other):
     tmp = np.empty(len(self.lines) + len(other), dtype=line_np_type)
-    ind = 0
-    for i, v in enumerate(self.lines):
-      tmp['index'][i] = v.index
-      tmp['top'][i] = v.top
-      tmp['down'][i] = v.down
-      ind = i
-    for i, v in enumerate(other):
-      tmp['index'][ind + i] = v.index
-      tmp['top'][ind + i] = v.top
-      tmp['down'][ind + i] = v.down
-    self.lines = tmp
-    self.lines = np.sort(self.lines)
+
+    v =  np.concatenate((self.lines, other))
+    tmp = v
+    self.maxH = np.max(tmp['top'])
+    self.maxW = np.max(tmp['index'])
+    self.minH = np.min(tmp['down'])
+    self.minH = np.min(tmp['index'])
+
+    self.lines = np.sort(tmp)
     return self
 
   def __repr__(self):

@@ -1,6 +1,6 @@
 from cmath import inf, nan
 from copyreg import pickle
-from analisis.classes.classes import Line, Island
+from analisis.classes.classes import Line, Island, line_np_type
 from analisis.loader.img_analizer import is_not_neighbours
 from logger import lg
 import pickle
@@ -31,8 +31,13 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
     # slow_draw_island(temp, img_clr.copy(), sleeptime=500, clr=(0,255,0), draw_over=True)
     isl = Island()
 
+    l = np.empty(len(temp), dtype=line_np_type)
+    l['index']  = np.array([l.index for l in temp ])
+    l['top']    = np.array([l.top   for l in temp ])
+    l['down']   = np.array([l.down  for l in temp ])
+
+    isl += l
     for i in temp:
-      isl.append_one_line(i)
       graph.remove(i)
     raw_islands.append(isl)
   return raw_islands
@@ -69,13 +74,13 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
         arr_lines2:list[Line] = []
 
         for line2_offset in (-1,0,1):
-          arr_lines2.extend(last_island.get_lines_at_index(line.index + line2_offset, check_bounds_top, line.down))
+          arr_lines2.extend(last_island.get_lines_at_index(line['index'] + line2_offset, check_bounds_top, line['down']))
         if len(arr_lines2) == 0: continue
 
-        neighbours_arr = map(lambda l: not is_not_neighbours(line, l), arr_lines2)
+        neighbours_arr = map(lambda l: is_not_neighbours(line, l), arr_lines2)
         condition = any([i for i in neighbours_arr])
 
-        if not condition:
+        if condition:
           continue
 
         last_island = last_island + cur_island

@@ -21,6 +21,7 @@ from constant.paths import PATH_TO_IMAGES, PATH_TO_INPUT_JPG, \
 
 import pickle
 import timeit
+from analisis.classes.classes import Line, Island, line_np_type
 
 # lg.info("palyground start")
 # file = "input.jpg"
@@ -53,17 +54,24 @@ def test(isl:Island, isl2:Island):
 
 isl = Island()
 isl2 = Island()
-for i in range(10):
-  l = Line(rnd.randint(0,10),rnd.randint(0,255),rnd.randint(0,75))
-  isl.append_one_line(l)
-for i in range(5):
-  isl2.append_one_line(Line(rnd.randint(0,45),rnd.randint(0,255),rnd.randint(0,78)))
+
+l = np.empty(10, dtype=line_np_type)
+l['index'] = np.random.randint(0,100, 10)
+l['top'] = np.random.randint(0,100, 10)
+l['down'] = np.random.randint(0,100, 10)
+isl += l
+
+l = np.empty(10, dtype=line_np_type)
+l['index'] = np.random.randint(0,100, 10)
+l['top'] = np.random.randint(0,100, 10)
+l['down'] = np.random.randint(0,100, 10)
+isl2 += l
 
 setup="""
 from __main__ import test, isl, isl2
 """
 
-tm = timeit.timeit('test(isl, isl2)', setup=setup, number=500)
+tm = timeit.timeit('test(isl, isl2)', setup=setup, number=1000)
 print(tm)
 # imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 # lg.info(f"fin")
