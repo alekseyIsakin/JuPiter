@@ -49,31 +49,37 @@ img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_COLOR)
 # with open("test2.bin", mode="wb") as f:
 #     pickle.dump({}, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-def test(isl:Island, isl2:Island):
-  isl = isl + isl2
+def test_add(isl1:Island, isl2:Island):
+  isl1 = isl1 + isl2
+  pass
+def test_get_lines(isl:Island, lst):
+  for i in lst:
+    isl.get_lines_at_index(i)
 
 isl = Island()
 isl2 = Island()
 
-cnt = 100
+cnt = 200
 l = np.empty(cnt, dtype=line_np_type)
 l['index'] = np.random.randint(0,100, cnt)
 l['top'] = np.random.randint(0,100, cnt)
 l['down'] = np.random.randint(0,100, cnt)
 isl += l
 
-cnt = 100
+cnt = 200
 l = np.empty(cnt, dtype=line_np_type)
 l['index'] = np.random.randint(0,100, cnt)
 l['top'] = np.random.randint(0,100, cnt)
 l['down'] = np.random.randint(0,100, cnt)
 isl2 += l
 
+# isl2 = np.arange(0, cnt, 1)
+
 setup="""
-from __main__ import test, isl, isl2
+from __main__ import test_add, isl, isl2
 """
 
-tm = timeit.timeit('test(isl, isl2)', setup=setup, number=500)
+tm = timeit.timeit('test_add(isl, isl2)', setup=setup, number=200)
 print(tm)
 # imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 # lg.info(f"fin")

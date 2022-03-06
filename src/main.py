@@ -19,7 +19,7 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_OUTPUT_JPG
 lg.info("Start")
 
-# file = "test7.png"
+# file = "test5.png"
 file = "input.jpg"
 img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_GRAYSCALE)
 img_clr:ndarray = cv2.imread(PATH_TO_INPUT_ + file)
@@ -28,8 +28,8 @@ lg.info(f"load image '{file}'")
 lg.debug(f"resolution '{file}' is {img.shape}")
 completeFull:list[list[list[Island]]] = []
 
-step_x = img.shape[1] // 5
-# step_y = img.shape[0] // 20
+step_x = img.shape[1] // 4
+# step_y = img.shape[0] // 2
 step_y = 20
 
 def fragment_calculate(coord_x:int, coord_y:int,
@@ -83,7 +83,7 @@ for col in completeFull:
   cur_row:list[Island] = []
   for row in col:
     cur_row.extend(row)
-    cur_row = _second_graph_config(cur_row)
+    cur_row = _second_graph_config(sorted(cur_row, key=len, reverse=True))
     isl = draw_islands(cur_row, isl)
   cv2.imshow('w', isl)
   cv2.waitKey(10)
@@ -98,7 +98,7 @@ isl:np.ndarray = img_clr.copy()
 complete_isl:list[Island] = []
 for i, row in enumerate(islands):
   complete_isl.extend(row)
-  complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=(i-1)*step_y)
+  complete_isl = _second_graph_config(sorted(complete_isl, key=len, reverse=True), check_bounds_top=(i-1)*step_y)
   isl = draw_islands(complete_isl, isl)
   cv2.imshow('w', isl)
   cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)

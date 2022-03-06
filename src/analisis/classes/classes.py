@@ -17,9 +17,10 @@ class Line():
     if key == 2 or key == 'down':  return self.down
     
   def __repr__(self):
-    return ("{ index: " + str(self.index) + ", " +\
-            "top: " + str(self.top) + ", "+ \
-            "down: " + str(self.down) + "}")
+    # return ("{ index: " + str(self.index) + ", " +\
+    #         "top: " + str(self.top) + ", "+ \
+    #         "down: " + str(self.down) + "}")
+    return f"<Line. Top: [{self.index}, {self.top}], Bottom: [{self.index}, {self.down}]>"
   
   def __lt__(self, other):
     return self.index < other.index
@@ -34,13 +35,13 @@ class Line():
             self.top == other.top and
             self.down == other.down)      
 
-  def is_neighbour(self, other)->bool:
-    if (abs(self.index - other.index) > 1): return False
-    if ((self.top <= (other.top+1) and self.top >= (other.down-1)) or
-          (self.down <= (other.top+1) and self.down >= (other.down-1)) or
-          (other.top <= (self.top+1) and other.top >= (self.down-1))  or
-          (other.down <= (self.top+1) and other.down >= (self.down-1))): return True
-    return False
+  # def is_neighbour(self, other)->bool:
+  #   if (abs(self.index - other.index) > 1): return False
+  #   if ((self.top <= (other.top+1) and self.top >= (other.down-1)) or
+  #         (self.down <= (other.top+1) and self.down >= (other.down-1)) or
+  #         (other.top <= (self.top+1) and other.top >= (self.down-1))  or
+  #         (other.down <= (self.top+1) and other.down >= (self.down-1))): return True
+  #   return False
 
 class Island():
   def __init__(self):
@@ -48,6 +49,8 @@ class Island():
     self.left = 0
     self.down = 0
     self.right = 0
+    self.line_x_pos = {0:0}
+    self._line_dict_step = 50
     self.lines = np.empty(0, dtype=line_np_type)
     pass
 
@@ -60,14 +63,21 @@ class Island():
   def get_lines_at_index(self, index:int, top:int=-inf, down:int=inf) -> list[Line]:
     if (index -1 > self.right or index +1 < self.left):
       return []
-    # if (top > self.minH +1 and down < self.maxH -1):
-    #   return []
-    for l in self.lines:
-      t1 = l['index'] == index
-      t2 = l['down'] > top 
-      t3 = t1 and t2
     
-    return [l for l in self.lines if (l['index'] == index) and (l['down'] > top )]
+    expected_first_index = 0
+    expected_last_index = len(self.lines)
+    
+    expected_first_key = index // self._line_dict_step
+    if expected_first_key in self.line_x_pos:
+      expected_first_index = self.line_x_pos[expected_first_key]
+
+    expected_last_key = expected_first_index + 1
+    if expected_last_key in self.line_x_pos:
+      expected_last_index = self.line_x_pos[expected_last_key]
+
+    sequence = self.lines[expected_first_index:expected_last_index]
+
+    return [l for l in sequence if (l['index'] == index) and (l['down'] > top )]
 
   def sort(self) -> None:
     self.lines = np.sort(self.lines)
@@ -87,16 +97,29 @@ class Island():
     self.lines = newlines
 
   def __add__(self, other):
+    min_new_index = min(other['index'])
+    dict_index_key = (min_new_index // self._line_dict_step) * self._line_dict_step
+
     tmp = np.empty(len(self.lines) + len(other), dtype=line_np_type)
 
     v =  np.concatenate((self.lines, other))
     tmp = v
+
     self.top = (np.min(tmp['top']))       # topY
     self.left = (np.min(tmp['index']))     # topX
     self.down = (np.max(tmp['down']))      # downY
     self.right = (np.max(tmp['index']))     # downX
 
     self.lines = np.sort(tmp)
+    key = 0
+
+    for i, line in enumerate(self.lines):
+      boundary = (key + 1) * self._line_dict_step
+      if line['index'] < boundary: continue
+
+      key = line['index'] // self._line_dict_step
+      self.line_x_pos[key] = i
+
     return self
 
   def __repr__(self):
