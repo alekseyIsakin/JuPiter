@@ -55,23 +55,25 @@ def test(isl:Island, isl2:Island):
 isl = Island()
 isl2 = Island()
 
-l = np.empty(10, dtype=line_np_type)
-l['index'] = np.random.randint(0,100, 10)
-l['top'] = np.random.randint(0,100, 10)
-l['down'] = np.random.randint(0,100, 10)
+cnt = 100
+l = np.empty(cnt, dtype=line_np_type)
+l['index'] = np.random.randint(0,100, cnt)
+l['top'] = np.random.randint(0,100, cnt)
+l['down'] = np.random.randint(0,100, cnt)
 isl += l
 
-l = np.empty(10, dtype=line_np_type)
-l['index'] = np.random.randint(0,100, 10)
-l['top'] = np.random.randint(0,100, 10)
-l['down'] = np.random.randint(0,100, 10)
+cnt = 100
+l = np.empty(cnt, dtype=line_np_type)
+l['index'] = np.random.randint(0,100, cnt)
+l['top'] = np.random.randint(0,100, cnt)
+l['down'] = np.random.randint(0,100, cnt)
 isl2 += l
 
 setup="""
 from __main__ import test, isl, isl2
 """
 
-tm = timeit.timeit('test(isl, isl2)', setup=setup, number=1000)
+tm = timeit.timeit('test(isl, isl2)', setup=setup, number=500)
 print(tm)
 # imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 # lg.info(f"fin")

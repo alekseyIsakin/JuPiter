@@ -121,9 +121,12 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
   #   cv2.imshow('cut off', isl1)
   #   cv2.imshow('remais', isl2)
     # cv2.waitKey(200)
+  arr_lines2:list[Line] = []
+  arr_clear = arr_lines2.clear
+  arr_extend = arr_lines2.extend
+  
   while len(islands) > 0:
     isl_rest = 0
-    t1 = time ()
     while isl_rest < len(islands)-1:
       found = False
       cur_island = islands[isl_rest]
@@ -138,12 +141,12 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
           last_island.top   -1 > cur_island.down):
           isl_rest += 1
           continue
-      
+
       for line in cur_island:
-        arr_lines2:list[Line] = []
+        arr_clear()
 
         for line2_offset in (-1,0,1):
-          arr_lines2.extend(get_nearest_lines(line['index'] + line2_offset, check_bounds_top, line['down']))
+          arr_extend(get_nearest_lines(line['index'] + line2_offset, check_bounds_top, line['down']))
         if len(arr_lines2) == 0: continue
 
         neighbours_arr = map(lambda l: is_neighbours(line, l), arr_lines2)
@@ -163,7 +166,5 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
       if not found: 
         isl_rest += 1
 
-    t2 = time ()
-    # print(f">>> {t2-t1}")
     complete.append(islands.pop())
   return complete
