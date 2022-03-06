@@ -55,6 +55,9 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
   #   cv2.imshow('z', isl2)
   #   cv2.waitKey(200)
 
+  arr_lines2:list[Line] = []
+  arr_extend = arr_lines2.extend
+  arr_clear = arr_lines2.clear
   while len(islands) > 0:
     isl_rest = 0
     
@@ -71,13 +74,11 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
           isl_rest += 1
           continue
 
-      arr_lines2:list[Line] = []
-      arr_ext = arr_lines2.extend
       for line in cur_island:
-        arr_lines2.clear()
+        arr_clear()
 
         for line2_offset in (-1,0,1):
-          arr_ext(get_nearest_lines (line.index + line2_offset, check_bounds_top, line.down))
+          arr_extend(get_nearest_lines (line.index + line2_offset, check_bounds_top, line.down))
         if len(arr_lines2) == 0: continue
 
         for line2 in arr_lines2:
