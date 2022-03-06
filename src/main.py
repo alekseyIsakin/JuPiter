@@ -19,8 +19,8 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_OUTPUT_JPG
 lg.info("Start")
 
-file = "test7.png"
-# file = "input.jpg"
+# file = "test7.png"
+file = "input.jpg"
 img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_GRAYSCALE)
 img_clr:ndarray = cv2.imread(PATH_TO_INPUT_ + file)
 
@@ -28,8 +28,8 @@ lg.info(f"load image '{file}'")
 lg.debug(f"resolution '{file}' is {img.shape}")
 completeFull:list[list[list[Island]]] = []
 
-step_x = img.shape[1] // 1
-step_y = img.shape[0] // 10
+step_x = img.shape[1] // 5
+step_y = img.shape[0] // 20
 # step_y = 80
 
 def fragment_calculate(coord_x:int, coord_y:int,
@@ -45,8 +45,8 @@ mask_inv = get_mask_from_gray(img, upper_val=100)
 mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR) 
 
 mask_array:list[np.ndarray] = []
-up_value_from = 140
-up_value_to = 150
+up_value_from = 110
+up_value_to = 120
 up_value_step = 10
 
 for up_value in range(up_value_from, up_value_to, up_value_step):
@@ -101,7 +101,7 @@ for i, row in enumerate(islands):
   complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=(i-1)*step_y)
   isl = draw_islands(complete_isl, isl)
   cv2.imshow('w', isl)
-  # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
+  cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
   cv2.waitKey(10)
 # cv2.waitKey(0)
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", isl)

@@ -58,11 +58,16 @@ class Island():
     return len(self.lines)
   
   def get_lines_at_index(self, index:int, top:int=-inf, down:int=inf) -> list[Line]:
-    if (index >= self.right or index <= self.left):
+    if (index -1 > self.right or index +1 < self.left):
       return []
     # if (top > self.minH +1 and down < self.maxH -1):
     #   return []
-    return [l for l in self.lines if (l['index'] == index) and (l['down'] > top-1)]
+    for l in self.lines:
+      t1 = l['index'] == index
+      t2 = l['down'] > top 
+      t3 = t1 and t2
+    
+    return [l for l in self.lines if (l['index'] == index) and (l['down'] > top )]
 
   def sort(self) -> None:
     self.lines = np.sort(self.lines)
@@ -86,10 +91,10 @@ class Island():
 
     v =  np.concatenate((self.lines, other))
     tmp = v
-    self.top = int(np.min(tmp['top']))       # topY
-    self.left = int(np.min(tmp['index']))     # topX
-    self.down = int(np.max(tmp['down']))      # downY
-    self.right = int(np.max(tmp['index']))     # downX
+    self.top = (np.min(tmp['top']))       # topY
+    self.left = (np.min(tmp['index']))     # topX
+    self.down = (np.max(tmp['down']))      # downY
+    self.right = (np.max(tmp['index']))     # downX
 
     self.lines = np.sort(tmp)
     return self

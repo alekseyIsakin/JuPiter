@@ -1,7 +1,7 @@
 from cmath import inf, nan
 from copyreg import pickle
 from analisis.classes.classes import Line, Island, line_np_type
-from analisis.loader.img_analizer import is_not_neighbours
+from analisis.loader.img_analizer import is_neighbours
 from drawing.draw import draw_islands
 from logger import lg
 from pprint import pp
@@ -42,7 +42,7 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
         arr_lines2.extend([l for l in graph if l.index == cur_line.index + line2_offset])
       
       for check_line in arr_lines2:
-        if is_not_neighbours(cur_line, check_line):
+        if not is_neighbours(cur_line, check_line):
           continue
         
         lines_to_check.append(check_line)
@@ -63,41 +63,41 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
     raw_islands.append(isl)
   return raw_islands
 
-def _first_graph_config_(graph:list[Line]) -> list[Island]:
-  raw_islands:list[Island] = []
-  graph = sorted(graph)
+# def _first_graph_config_(graph:list[Line]) -> list[Island]:
+#   raw_islands:list[Island] = []
+#   graph = sorted(graph)
   
-  temp = [graph.pop(0)]
+#   temp = [graph.pop(0)]
   
-  while (len(graph) != 0):
-    last_line = temp[-1]
+#   while (len(graph) != 0):
+#     last_line = temp[-1]
     
-    arr_lines2 = []
-    for line2_offset in (-1,0,1):
-      arr_lines2.extend([l for l in graph if l.index == last_line.index + line2_offset])
+#     arr_lines2 = []
+#     for line2_offset in (-1,0,1):
+#       arr_lines2.extend([l for l in graph if l.index == last_line.index + line2_offset])
     
-    have_no_neighbours = True
-    for check_line in arr_lines2:
-      if is_not_neighbours(last_line, check_line):
-        continue
-      have_no_neighbours = False
+#     have_no_neighbours = True
+#     for check_line in arr_lines2:
+#       if is_neighbours(last_line, check_line):
+#         continue
+#       have_no_neighbours = False
       
-      temp.append(check_line)
-      graph.remove(check_line)
+#       temp.append(check_line)
+#       graph.remove(check_line)
 
-    if not have_no_neighbours: continue
-    isl = Island()
+#     if not have_no_neighbours: continue
+#     isl = Island()
 
-    l = np.empty(len(temp), dtype=line_np_type)
-    l['index']  = np.array([l.index for l in temp ])
-    l['top']    = np.array([l.top   for l in temp ])
-    l['down']   = np.array([l.down  for l in temp ])
+#     l = np.empty(len(temp), dtype=line_np_type)
+#     l['index']  = np.array([l.index for l in temp ])
+#     l['top']    = np.array([l.top   for l in temp ])
+#     l['down']   = np.array([l.down  for l in temp ])
 
-    isl += l
-    # for i in temp:
-    #   graph.remove(i)
-    raw_islands.append(isl)
-  return raw_islands
+#     isl += l
+#     # for i in temp:
+#     #   graph.remove(i)
+#     raw_islands.append(isl)
+#   return raw_islands
 
 def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_bounds_down=inf) -> list[Island]:
   isl_rest = 0
@@ -119,7 +119,7 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
   #   isl2 = draw_islands(islands, np.ones((670, 1280,3))*0)
   #   cv2.imshow('cut off', isl1)
   #   cv2.imshow('remais', isl2)
-  #   cv2.waitKey(200)
+    cv2.waitKey(200)
   while len(islands) > 0:
     isl_rest = 0
     
@@ -145,10 +145,10 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
           arr_lines2.extend(last_island.get_lines_at_index(line['index'] + line2_offset, check_bounds_top, line['down']))
         if len(arr_lines2) == 0: continue
 
-        neighbours_arr = map(lambda l: is_not_neighbours(line, l), arr_lines2)
+        neighbours_arr = map(lambda l: is_neighbours(line, l), arr_lines2)
         condition = any([i for i in neighbours_arr])
 
-        if condition:
+        if not condition:
           continue
 
         last_island = last_island + cur_island
