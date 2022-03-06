@@ -48,12 +48,12 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
         complete.append(islands.pop(isl_rest))
       else:
         isl_rest += 1
-  if check_bounds_top != -inf:
-    isl1 = draw_islands(complete, np.ones((670, 1280))*0)
-    isl2 = draw_islands(islands, np.ones((670, 1280))*0)
-    cv2.imshow('q', isl1)
-    cv2.imshow('z', isl2)
-    cv2.waitKey(200)
+  # if check_bounds_top != -inf:
+  #   isl1 = draw_islands(complete, np.ones((670, 1280))*0)
+  #   isl2 = draw_islands(islands, np.ones((670, 1280))*0)
+  #   cv2.imshow('q', isl1)
+  #   cv2.imshow('z', isl2)
+  #   cv2.waitKey(200)
 
   while len(islands) > 0:
     isl_rest = 0

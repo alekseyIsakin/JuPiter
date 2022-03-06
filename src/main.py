@@ -17,6 +17,7 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_MASK_JPG, \
                   PATH_TO_MASK_, PATH_TO_OUTPUT_, \
                   PATH_TO_OUTPUT_JPG
+#last run: 8min with 140 black
 lg.info("Start")
 
 # file = "test5.png"
@@ -45,12 +46,12 @@ mask_inv = get_mask_from_gray(img, upper_val=100)
 mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR) 
 
 mask_array:list[np.ndarray] = []
-up_value_from = 130
-up_value_to = 140
-up_value_step = 10
+# up_value_from = 140
+# up_value_to = 150
+# up_value_step = 10
 
-for up_value in range(up_value_from, up_value_to, up_value_step):
-  mask_array.append(get_mask_from_gray(img, upper_val=up_value).copy())
+# for up_value in range(up_value_from, up_value_to, up_value_step):
+mask_array.append(get_mask_from_gray(img, upper_val=140).copy())
 
 isl = img_clr.copy()
 cv2.imshow('w', isl)
@@ -72,7 +73,7 @@ for i, mask in enumerate(mask_array):
 
       completeFull[y].append(complete.copy())
 
-      lg.debug(f">> coord:{(x,y)}, black:{up_value_from + i*up_value_step}, found [{len(complete)}]")
+      # lg.debug(f">> coord:{(x,y)}, black:{up_value_from + i*up_value_step}, found [{len(complete)}]")
       cv2.imshow('w', isl)
       cv2.waitKey(10)
   
@@ -107,6 +108,7 @@ for i, row in enumerate(islands):
 # cv2.waitKey(0)
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 
+lg.info("fin")
 exit()
 
 lines_arr = get_lines(mask_inv[:250,:250])
