@@ -49,8 +49,8 @@ class Island():
     self.left = 0
     self.down = 0
     self.right = 0
-    self.line_x_pos = {0:0}
-    self._line_dict_step = 50
+    self.line_x_pos = { }
+    self._line_dict_step = 7
     self.lines = np.empty(0, dtype=line_np_type)
     pass
 
@@ -67,13 +67,13 @@ class Island():
     expected_first_index = 0
     expected_last_index = len(self.lines)
     
-    expected_first_key = index // self._line_dict_step
-    if expected_first_key in self.line_x_pos:
-      expected_first_index = self.line_x_pos[expected_first_key]
+    # expected_first_key = index // self._line_dict_step
+    # if expected_first_key in self.line_x_pos:
+    #   expected_first_index = self.line_x_pos[expected_first_key]
 
-    expected_last_key = expected_first_index + 1
-    if expected_last_key in self.line_x_pos:
-      expected_last_index = self.line_x_pos[expected_last_key]
+    # expected_last_key = expected_first_key + 1
+    # if expected_last_key in self.line_x_pos:
+    #   expected_last_index = self.line_x_pos[expected_last_key]
 
     sequence = self.lines[expected_first_index:expected_last_index]
 
