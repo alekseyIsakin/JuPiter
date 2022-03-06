@@ -18,7 +18,7 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_MASK_, PATH_TO_OUTPUT_, \
                   PATH_TO_OUTPUT_JPG
 lg.info("Start")
-
+#tim 5.5min with 140 black
 # file = "test8.png"
 file = "input.jpg"
 img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_GRAYSCALE)
@@ -41,7 +41,7 @@ def fragment_calculate(coord_x:int, coord_y:int,
 
     return complete
 
-mask_inv = get_mask_from_gray(img, upper_val=120)
+mask_inv = get_mask_from_gray(img, upper_val=150)
 mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR) 
 
 mask_array:list[np.ndarray] = []
@@ -55,6 +55,8 @@ mask_array.append(mask_inv)
 isl = img_clr.copy()
 cv2.imshow('w', isl)
 # cv2.waitKey(0)
+
+lg.info(f"fragment building start")
 for i, mask in enumerate(mask_array):
   isl = img_clr.copy()
   for y in range(img.shape[0] // step_y):
@@ -72,6 +74,7 @@ for i, mask in enumerate(mask_array):
       # lg.debug(f">> coord:{(x,y)}, black:{up_value_from + i*up_value_step}, found [{len(complete)}]")
       cv2.imshow('w', isl)
       cv2.waitKey(10)
+lg.info(f"fragment building fin")
   
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands1.png", isl)
 
@@ -79,16 +82,18 @@ del isl
 isl:np.ndarray = img_clr.copy()
 islands:list[Island] = []
 
+lg.info(f"X-line building start")
 for col in completeFull:
   cur_row:list[Island] = []
   for row in col:
     cur_row.extend(row)
     cur_row = _second_graph_config(sorted(cur_row, key=len))
     isl = draw_islands(cur_row, isl)
-    cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", isl)
+    # cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", isl)
   cv2.imshow('w', isl)
   cv2.waitKey(10)
   islands.append(cur_row)
+lg.info(f"X-line building fin")
 
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", isl)
 
@@ -97,15 +102,18 @@ del isl
 
 isl:np.ndarray = np.full_like(img_clr, 255)
 complete_isl:list[Island] = []
+
+lg.info(f"final building start")
 for i, row in enumerate(islands):
   complete_isl.extend(row)
   complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=(i-1)*step_y)
   isl = draw_islands(complete_isl, isl)
   cv2.imshow('w', isl)
-  cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
+  # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
   cv2.waitKey(10)
 # cv2.waitKey(0)
-cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", isl)
+# cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", isl)
+lg.info(f"final building fin")
 
 lg.info("fin")
 exit()

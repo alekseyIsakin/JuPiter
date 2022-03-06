@@ -188,6 +188,7 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
       add_future_isl(cur_isl)
     isl = Island()
     for i in future_island:
+    # for i in sorted(future_island, key=len):
       isl += i
     complete.append(isl)
   return complete

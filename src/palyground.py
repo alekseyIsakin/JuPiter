@@ -59,14 +59,14 @@ def test_get_lines(isl:Island, lst):
 isl = Island()
 isl2 = Island()
 
-cnt = 200
+cnt = 10
 l = np.empty(cnt, dtype=line_np_type)
 l['index'] = np.random.randint(0,100, cnt)
 l['top'] = np.random.randint(0,100, cnt)
 l['down'] = np.random.randint(0,100, cnt)
 isl += l
 
-cnt = 200
+cnt = 1000
 l = np.empty(cnt, dtype=line_np_type)
 l['index'] = np.random.randint(0,100, cnt)
 l['top'] = np.random.randint(0,100, cnt)
@@ -79,7 +79,7 @@ setup="""
 from __main__ import test_add, isl, isl2
 """
 
-tm = timeit.timeit('test_add(isl, isl2)', setup=setup, number=200)
+tm = timeit.timeit('test_add(isl, isl2)', setup=setup,  number=100)
 print(tm)
 # imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 # lg.info(f"fin")
