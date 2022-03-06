@@ -62,6 +62,7 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
       found = False
       cur_island = islands[isl_rest]
       last_island = islands[-1]
+      get_nearest_lines = last_island.get_lines_at_index
       
       if (last_island.minW -1 > cur_island.maxW or
           last_island.maxW +1 < cur_island.minW or
@@ -70,11 +71,13 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
           isl_rest += 1
           continue
 
+      arr_lines2:list[Line] = []
+      arr_ext = arr_lines2.extend
       for line in cur_island:
-        arr_lines2:list[Line] = []
+        arr_lines2.clear()
 
         for line2_offset in (-1,0,1):
-          arr_lines2.extend(last_island.get_lines_at_index(line.index + line2_offset, check_bounds_top, line.down))
+          arr_ext(get_nearest_lines (line.index + line2_offset, check_bounds_top, line.down))
         if len(arr_lines2) == 0: continue
 
         for line2 in arr_lines2:
