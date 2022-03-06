@@ -1,3 +1,4 @@
+from cmath import inf
 import cv2
 import numpy as np
 import random as rnd
@@ -8,8 +9,8 @@ def get_lines(mask_inv:np.ndarray, offset_x=0, offset_y=0) -> list[Line]:
     graph = []
 
     for j in range(mask_inv.shape[1]):
-        higher = 0
-        lower = 0
+        higher = inf
+        lower = -inf
 
         cntBlank = 0
         lines = []
@@ -17,19 +18,19 @@ def get_lines(mask_inv:np.ndarray, offset_x=0, offset_y=0) -> list[Line]:
         for i in range(mask_inv.shape[0]):
             if mask_inv[i,j] == 255: 
                 cntBlank += 1
-                if lower == 0:
+                if lower == -inf:
                     continue
             
-            if lower == 0: lower = i
+            if lower == -inf: lower = i
             if mask_inv[i,j] != 255: 
                 higher = i
                 cntBlank = 0
             if cntBlank > 0:
-                lines.append(Line(j+offset_y, higher+offset_x, lower+offset_x))
-                lower = 0
-                higher = 0
+                lines.append(Line(j+offset_y, lower+offset_x, higher+offset_x))
+                lower = -inf
+                higher = inf
         if lower > 0:
-            lines.append(Line(j+offset_y, higher+offset_x, lower+offset_x))
+            lines.append(Line(j+offset_y, lower+offset_x, higher+offset_x))
         for l in lines:
             graph.append(l)
         lines.clear()
@@ -150,13 +151,16 @@ def get_low_up(graph:list[Island], img=np.zeros(0)) -> list[int]:
 
     return mainPoints
   
-def is_not_neighbours(l=Line(0,0,0), r=Line(0,0,0)):
-    if l == r: return False
-    return not (not abs(l['index'] - r['index']) > 1 and 
-         ((l['top'] <= (r['top']+1) and l['top'] >= (r['down']-1)) or
-          (l['down'] <= (r['top']+1) and l['down'] >= (r['down']-1)) or
-          (r['top'] <= (l['top']+1) and r['top'] >= (l['down']-1))  or
-          (r['down'] <= (l['top']+1) and r['down'] >= (l['down']-1))))
+def is_not_neighbours(left_line=Line(0,0,0), right_line=Line(0,0,0)):
+    if left_line == right_line: return False
+    
+    t1 = not abs(left_line['index'] - right_line['index']) > 1
+    t2 = (left_line['down'] <= right_line['down']+1 and left_line['down'] >= (right_line['top']-1))
+    t3 = (left_line['top'] <= (right_line['down']+1) and left_line['top'] >= (right_line['top']-1))
+    t4 = (right_line['down'] <= (left_line['down']+1) and right_line['down'] >= (left_line['top']-1))
+    t5 = (right_line['top'] <= (left_line['down']+1) and right_line['top'] >= (left_line['top']-1))
+    t6 = not (t1 and (t2 or t3 or t4 or t5))
+    return t6
   
 def is_not_neighbours_(l=Line(0,0,0), r=Line(0,0,0)):
     if l == r: return False

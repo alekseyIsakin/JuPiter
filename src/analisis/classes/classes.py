@@ -12,9 +12,9 @@ class Line():
     self.top = top
 
   def __getitem__(self, key):
-    if key == 0 or ['index']: return self.index
-    if key == 1 or ['top']:   return self.top
-    if key == 2 or ['down']:  return self.down
+    if key == 0 or key == 'index': return self.index
+    if key == 1 or key == 'top':   return self.top
+    if key == 2 or key == 'down':  return self.down
     
   def __repr__(self):
     return ("{ index: " + str(self.index) + ", " +\
@@ -44,10 +44,10 @@ class Line():
 
 class Island():
   def __init__(self):
-    self.maxH = 0
-    self.maxW = 0
-    self.minH = 0
-    self.minW = 0
+    self.top = 0
+    self.left = 0
+    self.down = 0
+    self.right = 0
     self.lines = np.empty(0, dtype=line_np_type)
     pass
 
@@ -58,32 +58,11 @@ class Island():
     return len(self.lines)
   
   def get_lines_at_index(self, index:int, top:int=-inf, down:int=inf) -> list[Line]:
-    if (index > self.maxW or index < self.minW):
+    if (index >= self.right or index <= self.left):
       return []
     # if (top > self.minH +1 and down < self.maxH -1):
     #   return []
     return [l for l in self.lines if (l['index'] == index) and (l['down'] > top-1)]
-    
-    
-
-  def append_one_line(self, l:Line) -> None:
-    if len(self.lines) == 0:
-      # self.lines.append = [l]
-      self.lines = np.append(self.lines, l)
-      self.maxH = l.top
-      self.maxW = l.index
-      self.minH = l.down
-      self.minW = l.index
-      return
-    else:
-      self.lines = np.append(self.lines, l)
-      # self.lines.append(l)
-    # self.lines = sorted(self.lines)
-    
-    self.maxH = max(l.top, self.maxH)
-    self.maxW = max(l.index, self.maxW)
-    self.minH = min(l.down, self.minH)
-    self.minW = min(l.index, self.minW)
 
   def sort(self) -> None:
     self.lines = np.sort(self.lines)
@@ -107,13 +86,13 @@ class Island():
 
     v =  np.concatenate((self.lines, other))
     tmp = v
-    self.maxH = np.max(tmp['top'])
-    self.maxW = np.max(tmp['index'])
-    self.minH = np.min(tmp['down'])
-    self.minH = np.min(tmp['index'])
+    self.top = int(np.min(tmp['top']))       # topY
+    self.left = int(np.min(tmp['index']))     # topX
+    self.down = int(np.max(tmp['down']))      # downY
+    self.right = int(np.max(tmp['index']))     # downX
 
     self.lines = np.sort(tmp)
     return self
 
   def __repr__(self):
-    return f"<Island. Top:{self.minH}, {self.minW}. Bottom:{self.maxH}, {self.maxW}>"
+    return f"<Island. Top: [{self.left}, {self.top}], Bottom: [{self.right}, {self.down}]>"

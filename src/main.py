@@ -19,7 +19,7 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_OUTPUT_JPG
 lg.info("Start")
 
-file = "test5.png"
+file = "test7.png"
 # file = "input.jpg"
 img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_GRAYSCALE)
 img_clr:ndarray = cv2.imread(PATH_TO_INPUT_ + file)
@@ -28,9 +28,9 @@ lg.info(f"load image '{file}'")
 lg.debug(f"resolution '{file}' is {img.shape}")
 completeFull:list[list[list[Island]]] = []
 
-step_x = img.shape[1] // 8
+step_x = img.shape[1] // 1
+step_y = img.shape[0] // 10
 # step_y = 80
-step_y = img.shape[0] // 8
 
 def fragment_calculate(coord_x:int, coord_y:int,
   step_x:int, step_y:int, mask_inv:np.ndarray) -> list[Island]:
@@ -45,8 +45,8 @@ mask_inv = get_mask_from_gray(img, upper_val=100)
 mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR) 
 
 mask_array:list[np.ndarray] = []
-up_value_from = 130
-up_value_to = 140
+up_value_from = 140
+up_value_to = 150
 up_value_step = 10
 
 for up_value in range(up_value_from, up_value_to, up_value_step):
@@ -62,10 +62,7 @@ for i, mask in enumerate(mask_array):
     for x in range(img.shape[1] // step_x):
       # lg.debug(f">> step {i} [{x}|{y}][{x*step_x}, {y*step_y}]")
 
-      # lines_arr = get_lines(mask_inv)
-      # complete = islands_from_lines(lines_arr)
-
-      complete = fragment_calculate(y*step_y,x*step_x,  step_y+1,step_x+1, mask)
+      complete = fragment_calculate(y*step_y,x*step_x,  step_y, step_x, mask)
       # isl[y*step_y:(y+1)*step_y, x*step_x:(x+1)*step_x] = 255
       isl = draw_islands(complete, isl)
       isl = cv2.rectangle(isl, (x*step_x, y*step_y),((x+1)*step_x,(y+1)*step_y,), color=(0,0,255))
@@ -76,7 +73,7 @@ for i, mask in enumerate(mask_array):
       cv2.imshow('w', isl)
       cv2.waitKey(10)
   
-cv2.imwrite(PATH_TO_MASK_ + "_test.png", isl)
+cv2.imwrite(PATH_TO_OUTPUT_ + "islands1.png", isl)
 
 del isl
 isl:np.ndarray = img_clr.copy()
@@ -87,15 +84,16 @@ for col in completeFull:
   for row in col:
     cur_row.extend(row)
     cur_row = _second_graph_config(cur_row)
-  islands.append(cur_row)
-
-  isl = draw_islands(cur_row, isl)
+    isl = draw_islands(cur_row, isl)
   cv2.imshow('w', isl)
   cv2.waitKey(10)
+  islands.append(cur_row)
+
+cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", isl)
 
 del completeFull
-
 del isl
+
 isl:np.ndarray = img_clr.copy()
 complete_isl:list[Island] = []
 for i, row in enumerate(islands):
@@ -103,9 +101,10 @@ for i, row in enumerate(islands):
   complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=(i-1)*step_y)
   isl = draw_islands(complete_isl, isl)
   cv2.imshow('w', isl)
+  # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
   cv2.waitKey(10)
 # cv2.waitKey(0)
-cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
+cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", isl)
 
 exit()
 
