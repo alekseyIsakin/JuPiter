@@ -1,3 +1,4 @@
+import cProfile
 from distutils.archive_util import make_archive
 from pprint import pprint as pp
 from copy import deepcopy
@@ -18,7 +19,7 @@ from constant.paths import PATH_TO_INPUT_JPG, \
                   PATH_TO_MASK_, PATH_TO_OUTPUT_, \
                   PATH_TO_OUTPUT_JPG
 lg.info("Start")
-#tim 5.5min with 140 black
+#tim 1min with 140 black
 # file = "test8.png"
 file = "input.jpg"
 img:ndarray     = cv2.imread(PATH_TO_INPUT_ + file, cv2.IMREAD_GRAYSCALE)
@@ -28,9 +29,9 @@ lg.info(f"load image '{file}'")
 lg.debug(f"resolution '{file}' is {img.shape}")
 completeFull:list[list[list[Island]]] = []
 
-step_x = img.shape[1] // 4
-# step_y = img.shape[0] // 4
-step_y = 40
+step_x = img.shape[1] // 40
+step_y = img.shape[0] // 1
+# step_y = 20
 
 def fragment_calculate(coord_x:int, coord_y:int,
   step_x:int, step_y:int, mask_inv:np.ndarray) -> list[Island]:
@@ -41,7 +42,7 @@ def fragment_calculate(coord_x:int, coord_y:int,
 
     return complete
 
-mask_inv = get_mask_from_gray(img, upper_val=150)
+mask_inv = get_mask_from_gray(img, upper_val=140)
 mask = cv2.cvtColor(mask_inv, cv2.COLOR_GRAY2BGR) 
 
 mask_array:list[np.ndarray] = []
@@ -85,13 +86,14 @@ islands:list[Island] = []
 lg.info(f"X-line building start")
 for col in completeFull:
   cur_row:list[Island] = []
-  for row in col:
+  cur_row.extend(col[0])
+  for i, row in enumerate(col[1:]):
     cur_row.extend(row)
-    cur_row = _second_graph_config(sorted(cur_row, key=len))
+    cur_row = _second_graph_config(sorted(cur_row, key=len), left_bound=((i+1)*step_x))
     isl = draw_islands(cur_row, isl)
     # cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", isl)
-  cv2.imshow('w', isl)
-  cv2.waitKey(10)
+    cv2.imshow('w', isl)
+    cv2.waitKey(10)
   islands.append(cur_row)
 lg.info(f"X-line building fin")
 
@@ -102,19 +104,40 @@ del isl
 
 isl:np.ndarray = np.full_like(img_clr, 255)
 complete_isl:list[Island] = []
+complete_isl.extend(islands[0])
 
 lg.info(f"final building start")
-for i, row in enumerate(islands):
-  complete_isl.extend(row)
-  complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=(i-1)*step_y)
-  isl = draw_islands(complete_isl, isl)
-  cv2.imshow('w', isl)
-  # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
-  cv2.waitKey(10)
-# cv2.waitKey(0)
-# cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", isl)
+
+# with cProfile.Profile() as pr:
+#   for i, row in enumerate(islands[1:]):
+#     complete_isl.extend(row)
+#     complete_isl = _second_graph_config(sorted(complete_isl, key=len), check_bounds_top=i*step_y)
+#     isl = draw_islands(complete_isl, isl)
+#     cv2.imshow('w', isl)
+#     # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
+#     cv2.waitKey(10)
+#   pr.print_stats(sort='cumtime')
+
+# pre_complete:list[Island] = []
+# while len(islands) > 0:
+#   tmp = zip(islands[::2],islands[1::2])
+#   islands.clear()
+#   for row_tuple in tmp:
+#     pre_complete.clear()
+#     pre_complete.extend(row_tuple[0])
+#     pre_complete.extend(row_tuple[1])
+
+#     pre_complete = _second_graph_config(sorted(pre_complete, key=len), check_bounds_top=(i-1)*step_y)
+#     islands.append(pre_complete)
+
+#     isl = draw_islands(pre_complete, isl)
+#     cv2.imshow('w', isl)
+#     # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
+#     cv2.waitKey(10)
+cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", isl)
 lg.info(f"final building fin")
 
+complete_isl =sorted(complete_isl, key=len, reverse=True)
 lg.info("fin")
 exit()
 

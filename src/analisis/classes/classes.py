@@ -67,13 +67,13 @@ class Island():
     expected_first_index = 0
     expected_last_index = len(self.lines)
     
-    # expected_first_key = index // self._line_dict_step
-    # if expected_first_key in self.line_x_pos:
-    #   expected_first_index = self.line_x_pos[expected_first_key]
+    expected_first_key = index // self._line_dict_step
+    if expected_first_key in self.line_x_pos:
+      expected_first_index = self.line_x_pos[expected_first_key]
 
-    # expected_last_key = expected_first_key + 1
-    # if expected_last_key in self.line_x_pos:
-    #   expected_last_index = self.line_x_pos[expected_last_key]
+    expected_last_key = expected_first_key + 1
+    if expected_last_key in self.line_x_pos:
+      expected_last_index = self.line_x_pos[expected_last_key]
 
     sequence = self.lines[expected_first_index:expected_last_index]
 
@@ -98,7 +98,7 @@ class Island():
 
   def __add__(self, other):
     min_new_index = min(other['index'])
-    dict_index_key = (min_new_index // self._line_dict_step) * self._line_dict_step
+    # dict_index_key = (min_new_index // self._line_dict_step) * self._line_dict_step
 
     tmp = np.empty(len(self.lines) + len(other), dtype=line_np_type)
 
@@ -112,6 +112,7 @@ class Island():
 
     self.lines = np.sort(tmp)
     key = 0
+    # start_index = self.line_x_pos [dict_index_key] if dict_index_key in self.line_x_pos else 0
 
     for i, line in enumerate(self.lines):
       boundary = (key + 1) * self._line_dict_step

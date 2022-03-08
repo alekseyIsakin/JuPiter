@@ -1,7 +1,7 @@
+from collections import deque
 from pprint import pprint as pp
 from copy import deepcopy
 import timeit
-
 from cv2 import imwrite
 
 from logger import lg
@@ -18,7 +18,7 @@ from constant.paths import PATH_TO_IMAGES, PATH_TO_INPUT_JPG, \
                   PATH_TO_MASK_JPG, \
                   PATH_TO_MASK_, \
                   PATH_TO_OUTPUT_
-
+import cProfile
 import pickle
 import timeit
 from analisis.classes.classes import Line, Island, line_np_type
@@ -56,30 +56,40 @@ def test_get_lines(isl:Island, lst):
   for i in lst:
     isl.get_lines_at_index(i)
 
+def test_pop(isl:list):
+  while len(isl) > 0:
+    isl.pop()
+
+def test_extend(isl:list, isl2:list):
+  isl.extend(isl2)
+
 isl = Island()
 isl2 = Island()
-
-cnt = 10
-l = np.empty(cnt, dtype=line_np_type)
-l['index'] = np.random.randint(0,100, cnt)
-l['top'] = np.random.randint(0,100, cnt)
-l['down'] = np.random.randint(0,100, cnt)
-isl += l
 
 cnt = 1000
 l = np.empty(cnt, dtype=line_np_type)
 l['index'] = np.random.randint(0,100, cnt)
 l['top'] = np.random.randint(0,100, cnt)
 l['down'] = np.random.randint(0,100, cnt)
+isl += l
+
+cnt = 10
+l = np.empty(cnt, dtype=line_np_type)
+l['index'] = np.random.randint(0,100, cnt)
+l['top'] = np.random.randint(0,100, cnt)
+l['down'] = np.random.randint(0,100, cnt)
 isl2 += l
 
+isl = [i for i in range(cnt) ]
+isl2 = [i for i in range(cnt) ]
+# with open("", 'w') as f:
 # isl2 = np.arange(0, cnt, 1)
 
 setup="""
-from __main__ import test_add, isl, isl2
+from __main__ import test_extend, isl, isl2
 """
 
-tm = timeit.timeit('test_add(isl, isl2)', setup=setup,  number=100)
-print(tm)
+tm = timeit.repeat('test_extend(isl, isl2)', setup=setup, repeat=1_000, number=10_000)
+print(np.average(tm))
 # imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
 # lg.info(f"fin")

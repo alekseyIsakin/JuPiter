@@ -64,73 +64,18 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
     raw_islands.append(isl)
   return raw_islands
 
-def _second_graph_config_(islands:list[Island], check_bounds_top=-inf, check_bounds_down=inf) -> list[Island]:
+def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) -> list[Island]:
   isl_rest = 0
   complete:list[Island] = []
           
   isl_rest = 0
 
-  if (check_bounds_top != -inf):
-    while isl_rest < len(islands):
-      if islands[isl_rest].down +1 < check_bounds_top:
-        complete.append(islands.pop(isl_rest))
-      else:
-        isl_rest += 1
-  arr_lines:list[Line] = []
-  arr_extend = arr_lines.extend
-  arr_clear = arr_lines.clear
-  while len(islands) > 0:
-    isl_rest = 0
-    
-    while isl_rest < len(islands)-1:
-      found = False
-      cur_island = islands[isl_rest]
-      last_island = islands[-1]
-      get_nearest_lines = last_island.get_lines_at_index
-      
-      if (last_island.right +1 < cur_island.left  or
-          last_island.left  -1 > cur_island.right or
-          last_island.down  +1 < cur_island.top   or
-          last_island.top   -1 > cur_island.down):
-          isl_rest += 1
-          continue
-
-      for line in cur_island:
-        arr_clear()
-
-        for line2_offset in (-1,0,1):
-          arr_extend(get_nearest_lines(line['index'] + line2_offset, check_bounds_top, line['down']))
-        if len(arr_lines) == 0: continue
-
-        for line2 in arr_lines:
-          if not is_neighbours(line, line2): continue
-          last_island = last_island + cur_island
-
-          del islands[isl_rest]
-          # islands.remove(cur_island)
-          isl_rest = 0
-          found = True
-          break
-        if found: break
-        
-      if not found: 
-        isl_rest += 1
-
-    complete.append(islands.pop())
-  return complete
-
-def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_bounds_down=inf) -> list[Island]:
-  isl_rest = 0
-  complete:list[Island] = []
-          
-  isl_rest = 0
-
-  if (check_bounds_top != nan):
-    while isl_rest < len(islands):
-      if islands[isl_rest].down +1 < check_bounds_top:
-        complete.append(islands.pop(isl_rest))
-      else:
-        isl_rest += 1
+  while isl_rest < len(islands):
+    if (islands[isl_rest].down  +1 < top_bound or 
+        islands[isl_rest].right +1 < left_bound) :
+      complete.append(islands.pop(isl_rest))
+    else:
+      isl_rest += 1
   
   if (len(islands) == 0):
     return complete
@@ -148,6 +93,10 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
   arr_extend = arr_lines.extend
   arr_clear = arr_lines.clear
 
+  check_lines = []
+  check_l_clear = check_lines.clear
+  check_extend = check_lines.extend
+
   while len(islands) > 0 or len(islands_to_check) > 0:
     future_island.clear()
 
@@ -163,13 +112,22 @@ def _second_graph_config(islands:list[Island], check_bounds_top=-inf, check_boun
             cur_isl.down  +1 < check_isl.top   or
             cur_isl.top   -1 > check_isl.down):
             continue
-        get_lines = check_isl.get_lines_at_index
+        check_isl_lines = check_isl.get_lines_at_index
+        cur_isl_lines = cur_isl.get_lines_at_index
+        check_l_clear()
 
-        for line in cur_isl:
+        if left_bound == -inf:
+          check_lines = cur_isl.lines 
+        else:
+          check_extend(cur_isl_lines(left_bound - 1))
+          check_extend(cur_isl_lines(left_bound + 0))
+          check_extend(cur_isl_lines(left_bound + 1))
+
+        for line in check_lines:
           arr_clear()
 
           for line2_offset in (-1,0,1):
-            arr_extend(get_lines(line['index'] + line2_offset, check_bounds_top, line['down']))
+            arr_extend(check_isl_lines(line['index'] + line2_offset, top_bound, line['down']))
           if len(arr_lines) == 0: continue
 
           found = False
