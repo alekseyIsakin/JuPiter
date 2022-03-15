@@ -3,9 +3,7 @@ from analisis.classes.classes import Line, Island, line_np_type
 from analisis.loader.img_analizer import is_neighbours
 from logger import lg
 from pprint import pp
-import pickle
 import numpy as np
-import cv2
 
 
 
