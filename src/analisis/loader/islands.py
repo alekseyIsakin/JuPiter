@@ -1,23 +1,49 @@
-from cmath import inf, nan
-from copyreg import pickle
-from time import time
+from cmath import inf
 from analisis.classes.classes import Line, Island, line_np_type
 from analisis.loader.img_analizer import is_neighbours
-from drawing.draw import draw_islands
 from logger import lg
 from pprint import pp
 import pickle
 import numpy as np
 import cv2
 
-def islands_from_lines(graph:list[Line]) -> list[Island]:
-  complete:list[Island] 
-  
-  complete = _first_graph_config(graph)
-  # complete = _second_graph_config(sorted(complete, key=len))
-  return complete
 
-def _first_graph_config(graph:list[Line]) -> list[Island]:
+
+def get_lines(mask_inv:np.ndarray, offset_x=0, offset_y=0) -> list[Line]:
+    graph = []
+
+    for j in range(mask_inv.shape[1]):
+        higher = inf
+        lower = -inf
+
+        cntBlank = 0
+        lines = []
+
+        for i in range(mask_inv.shape[0]):
+            if mask_inv[i,j] == 255: 
+                cntBlank += 1
+                if lower == -inf:
+                    continue
+            
+            if lower == -inf: lower = i
+            if mask_inv[i,j] != 255: 
+                higher = i
+                cntBlank = 0
+            if cntBlank > 0:
+                lines.append(Line(j+offset_y, lower+offset_x, higher+offset_x))
+                lower = -inf
+                higher = inf
+        if lower > -inf:
+            lines.append(Line(j+offset_y, lower+offset_x, higher+offset_x))
+        for l in lines:
+            graph.append(l)
+        lines.clear()
+    
+    return graph
+
+
+
+def islands_from_lines(graph:list[Line]) -> list[Island]:
   if (len(graph) == 0):
     return []
 
@@ -64,6 +90,20 @@ def _first_graph_config(graph:list[Line]) -> list[Island]:
     raw_islands.append(isl)
   return raw_islands
 
+
+
+def fragment_calculate(coord_x:int, coord_y:int,
+  step_x:int, step_y:int, mask:np.ndarray) -> list[Island]:
+    lines = get_lines(mask [
+      coord_x:coord_x + step_x,
+      coord_y:coord_y + step_y], coord_x, coord_y)
+
+    islands = islands_from_lines(lines)
+
+    return islands
+
+
+
 def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) -> list[Island]:
   isl_rest = 0
   complete:list[Island] = []
@@ -89,13 +129,13 @@ def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) 
   future_island:list[Island]    = []
   add_future_isl = future_island.append
 
-  arr_lines:list[Line] = []
-  arr_extend = arr_lines.extend
-  arr_clear = arr_lines.clear
-
-  check_lines = []
-  check_l_clear = check_lines.clear
+  check_lines:list[Line] = []
   check_extend = check_lines.extend
+  check_clear = check_lines.clear
+
+  largest_isl_lines = []
+  largest_isl_clear = largest_isl_lines.clear
+  largest_isl_extend = largest_isl_lines.extend
 
   while len(islands) > 0 or len(islands_to_check) > 0:
     future_island.clear()
@@ -104,34 +144,43 @@ def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) 
       add_check_isl(islands.pop())
 
     while (len(islands_to_check) > 0):
-      cur_isl = pop_check_isl()
+      largest_isl = pop_check_isl()
 
       for check_isl in islands:
-        if (cur_isl.right +1 < check_isl.left  or
-            cur_isl.left  -1 > check_isl.right or
-            cur_isl.down  +1 < check_isl.top   or
-            cur_isl.top   -1 > check_isl.down):
+        if (largest_isl.right +1 < check_isl.left  or
+            largest_isl.left  -1 > check_isl.right or
+            largest_isl.down  +1 < check_isl.top   or
+            largest_isl.top   -1 > check_isl.down):
             continue
         check_isl_lines = check_isl.get_lines_at_index
-        cur_isl_lines = cur_isl.get_lines_at_index
-        check_l_clear()
+        cur_isl_lines = largest_isl.get_lines_at_index
+        
+        largest_isl_clear()
 
-        if left_bound == -inf:
-          check_lines = cur_isl.lines 
-        else:
-          check_extend(cur_isl_lines(left_bound - 1))
-          check_extend(cur_isl_lines(left_bound + 0))
-          check_extend(cur_isl_lines(left_bound + 1))
+        if left_bound == -inf and top_bound == -inf:
+          largest_isl_extend(largest_isl.lines)
+        
+        if left_bound != -inf:
+          largest_isl_extend(cur_isl_lines(left_bound - 1))
+          largest_isl_extend(cur_isl_lines(left_bound + 0))
+          largest_isl_extend(cur_isl_lines(left_bound + 1))
+        if top_bound != -inf:
+          if top_bound == largest_isl.down +1:
+            largest_isl_extend(largest_isl.get_lines_at_down())
+          if top_bound == largest_isl.top:
+            largest_isl_extend(largest_isl.get_lines_at_top())
 
-        for line in check_lines:
-          arr_clear()
+          largest_isl_extend(largest_isl.lines)
+          
+        for line in largest_isl_lines:
+          check_clear()
 
           for line2_offset in (-1,0,1):
-            arr_extend(check_isl_lines(line['index'] + line2_offset, top_bound, line['down']))
-          if len(arr_lines) == 0: continue
+            check_extend(check_isl_lines(line['index'] + line2_offset))
+          if len(check_lines) == 0: continue
 
           found = False
-          for line2 in arr_lines:
+          for line2 in check_lines:
             if not is_neighbours(line, line2): continue
 
             # islands.remove(cur_island)
@@ -143,7 +192,7 @@ def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) 
       for i in [isl for isl in islands_to_check if isl in islands]:
         remove_isl_gen(i)
 
-      add_future_isl(cur_isl)
+      add_future_isl(largest_isl)
     isl = Island()
     for i in future_island:
     # for i in sorted(future_island, key=len):

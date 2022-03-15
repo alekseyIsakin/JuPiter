@@ -50,7 +50,9 @@ class Island():
     self.down = 0
     self.right = 0
     self.line_x_pos = { }
-    self._line_dict_step = 7
+    self.lines_at_down = set()
+    self.lines_at_top  = set()
+    self._line_dict_step = 25
     self.lines = np.empty(0, dtype=line_np_type)
     pass
 
@@ -59,7 +61,13 @@ class Island():
   
   def __len__(self) -> int:
     return len(self.lines)
+
+  def get_lines_at_top(self):
+    return [self.lines[i] for i in self.lines_at_top]
   
+  def get_lines_at_down(self):
+    return [self.lines[i] for i in self.lines_at_down]
+
   def get_lines_at_index(self, index:int, top:int=-inf, down:int=inf) -> list[Line]:
     if (index -1 > self.right or index +1 < self.left):
       return []
@@ -95,15 +103,18 @@ class Island():
       newlines[-1].top  = max(newlines[-1].top,  l.top)
       newlines[-1].down = min(newlines[-1].down, l.down)
     self.lines = newlines
+  
+  def solidify():
+    pass
 
   def __add__(self, other):
     min_new_index = min(other['index'])
     # dict_index_key = (min_new_index // self._line_dict_step) * self._line_dict_step
 
-    tmp = np.empty(len(self.lines) + len(other), dtype=line_np_type)
+    # tmp = np.empty(len(self.lines) + len(other), dtype=line_np_type)
 
-    v =  np.concatenate((self.lines, other))
-    tmp = v
+    tmp =  np.concatenate((self.lines, other))
+    #  = v
 
     self.top = (np.min(tmp['top']))       # topY
     self.left = (np.min(tmp['index']))     # topX
@@ -121,6 +132,8 @@ class Island():
       key = line['index'] // self._line_dict_step
       self.line_x_pos[key] = i
 
+    self.lines_at_top  = set([i for i, l in enumerate(self.lines['top'])  if l == self.top])
+    self.lines_at_down = set([i for i, l in enumerate(self.lines['down']) if l == self.down])
     return self
 
   def __repr__(self):
