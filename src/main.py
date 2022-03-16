@@ -7,13 +7,13 @@ from logger import lg, initLogger
 from numpy import ndarray
 from analisis.loader.img_analizer import *
 from analisis.loader.mask_loader import *
-from analisis.loader.islands import fragment_calculate, islands_from_lines, _second_graph_config
+from analisis.loader.islands import build_islands_from_fragmets, fragment_calculate
 from drawing.draw import *
 from drawing.show import *
 from constant.paths import PATH_TO_INPUT_, PATH_TO_OUTPUT_
 
 #last execute: 1min with 140 black
-initLogger(lg.DEBUG)
+initLogger(lg.INFO)
 
 lg.info("Start")
 
@@ -32,7 +32,7 @@ step_y = img.shape[0] // 4
 # step_y = 80
 lg.debug(f"step_x [{step_x}], step_y [{step_y}] ")
 
-mask_inv = get_mask_from_gray(img, upper_val=120)
+mask_inv = get_mask_from_gray(img, upper_val=100)
 
 masks:list[np.ndarray] = []
 
@@ -40,8 +40,6 @@ img_isl        :np.ndarray   = img_clr.copy()
 cv2.imshow('w', img_isl)
 
 lg.info(f"start fragment building")
-
-
 for x in range(mask_inv.shape[1] // step_x):
   fragmentsWithIslands.append([])
   for y in range(mask_inv.shape[0] // step_y):
@@ -59,45 +57,12 @@ for x in range(mask_inv.shape[1] // step_x):
     cv2.waitKey(10)
 
 cv2.imwrite(PATH_TO_OUTPUT_ + "islands1.png", img_isl)
-lg.info(f"fin fragment building")
-
-lg.info(f"start Y-line building")
-complete_collumns:list[Island] = []
-
-for row in fragmentsWithIslands:
-  cur_row = []
-  cur_row.extend(row[0])
-  for i, col in enumerate(row[1:]):
-    cur_row.extend(sorted(col, key=len))
-    cur_row = _second_graph_config(cur_row, top_bound=i*step_y)
-    cur_row = sorted(cur_row, key=len)
-  complete_collumns.append(cur_row)
-  img_isl = draw_islands(cur_row, img_isl)
-  cv2.imshow('w', img_isl)
-  # cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", isl)
-  cv2.waitKey(10)
-
-cv2.imwrite(PATH_TO_OUTPUT_ + "islands3.png", img_isl)
-lg.info(f"fin Y-line building")
-
-lg.info(f"start X-line building")
-img_isl        :np.ndarray   = img_clr.copy()
-complete_islands:list[Island] = []
-cur_row        :list[Island] = []
-
-complete_islands.extend(complete_collumns[0])
-for i, col in enumerate(complete_collumns[1:]):
-  complete_islands.extend(col)
-  complete_islands = _second_graph_config(sorted(complete_islands, key=len), left_bound=((i+1)*step_x))
-  img_isl = draw_islands(complete_islands, img_isl)
-  cv2.imshow('w', img_isl)
-  cv2.waitKey(10)
-lg.info(f"fin X-line building")
-
-cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", img_isl)
 
 img_isl     :np.ndarray   = np.full_like(img_clr, 255)
-complete_isl:list[Island] = []
+complete_isl:list[Island] = build_islands_from_fragmets(fragmentsWithIslands, step_x, step_y)
+
+img_isl = draw_islands(complete_isl, img_isl)
+cv2.imwrite(PATH_TO_OUTPUT_ + "islands.png", img_isl)
 # complete_isl.extend(sorted(rowsWithIslands[0], key=len))
 
 # del fragmentsWithIslands

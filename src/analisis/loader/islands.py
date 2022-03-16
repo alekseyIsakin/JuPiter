@@ -73,7 +73,6 @@ def islands_from_lines(graph:list[Line]) -> list[Island]:
         lines_to_check.append(check_line)
         remove_line(check_line)
       new_complete_line(cur_line)
-    
 
     isl = Island()
 
@@ -173,15 +172,15 @@ def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) 
         for line in largest_isl_lines:
           check_clear()
 
-          for line2_offset in (-1,0,1):
-            check_extend(check_isl_lines(line['index'] + line2_offset))
+          check_extend(check_isl_lines(line['index'] - 1))
+          check_extend(check_isl_lines(line['index'] + 0))
+          check_extend(check_isl_lines(line['index'] + 1))
           if len(check_lines) == 0: continue
 
           found = False
           for line2 in check_lines:
             if not is_neighbours(line, line2): continue
 
-            # islands.remove(cur_island)
             found = True
             add_check_isl(check_isl)
             break
@@ -197,3 +196,32 @@ def _second_graph_config(islands:list[Island], top_bound=-inf, left_bound=-inf) 
       isl += i
     complete.append(isl)
   return complete
+
+
+
+def build_islands_from_fragmets(fragmentsWithIslands:list[list[list[Island]]], 
+    step_x:int, step_y:int) -> list[Island]:
+  complete_collumns:list[Island] = []
+
+  lg.debug(f"start fragment building")
+  for row_i, row in enumerate(fragmentsWithIslands):
+    cur_row = []
+    cur_row.extend(row[0])
+    for col_i, col in enumerate(row[1:]):
+      cur_row.extend(sorted(col, key=len))
+      cur_row = _second_graph_config(cur_row, top_bound=col_i*step_y)
+      cur_row = sorted(cur_row, key=len)
+    lg.debug(f"в колонке {row_i+1}, найденно [{len(cur_row)}] островов")
+    complete_collumns.append(cur_row)
+
+  complete_islands:list[Island] = []
+  cur_row         :list[Island] = []
+
+  complete_islands.extend(complete_collumns[0])
+  for row_i, col in enumerate(complete_collumns[1:]):
+    complete_islands.extend(col)
+    complete_islands = _second_graph_config(sorted(complete_islands, key=len), left_bound=((row_i+1)*step_x))
+    lg.debug(f"строка {row_i+1}, всего найденно [{len(complete_islands)}] островов")
+  
+  return complete_islands
+  # cv2.imwrite(PATH_TO_OUTPUT_ + "islands2.png", img_isl)
